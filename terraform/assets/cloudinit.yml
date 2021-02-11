@@ -1,0 +1,9 @@
+#cloud-config
+
+timezone: UTC
+
+system_info:
+  default_user:
+    name: admin
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD: ALL"
