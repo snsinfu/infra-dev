@@ -63,7 +63,10 @@ $ dotenv
 dotenv: Loading .env.gpg
 ```
 
-Then, [create a Debian ZFS image](https://github.com/snsinfu/hetzner-zfs-image).
+Then, [create a Debian ZFS image][zfsimage].
+
+[dotenv]: https://github.com/snsinfu/dotenv
+[zfsimage]: https://github.com/snsinfu/hetzner-zfs-image
 
 
 ### 3. Create server
