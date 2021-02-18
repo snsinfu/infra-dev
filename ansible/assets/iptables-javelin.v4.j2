@@ -1,0 +1,26 @@
+* filter
+
+:INPUT   DROP
+:OUTPUT  ACCEPT
+:FORWARD DROP
+
+-A INPUT -j ACCEPT -i lo
+-A INPUT -j ACCEPT -m state --state ESTABLISHED,RELATED
+-A INPUT -j DROP   -m state --state INVALID
+-A INPUT -j ACCEPT -p icmp
+
+-A INPUT -j ACCEPT -i {{ external_interface }} -p tcp --dport http      -m state --state NEW
+-A INPUT -j ACCEPT -i {{ external_interface }} -p tcp --dport https     -m state --state NEW
+-A INPUT -j ACCEPT -i {{ external_interface }} -p udp --dport wireguard -m state --state NEW
+-A INPUT -j DROP   -i {{ external_interface }}
+
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport ssh        -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p udp --dport domain     -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport http       -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport https      -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport nfs        -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport postgresql -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport k3s        -m state --state NEW
+-A INPUT -j REJECT -i {{ wireguard_interface }}
+
+COMMIT

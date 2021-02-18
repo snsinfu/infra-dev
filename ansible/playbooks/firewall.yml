@@ -1,0 +1,20 @@
+- hosts: javelin
+  become: true
+
+  vars:
+    external_interface: "{{ ansible_default_ipv4.interface }}"
+
+  tasks:
+    - name: non-standard service names are registered
+      stanza:
+        path: /etc/services
+        content: |
+          k3s        6443/tcp
+          wireguard  {{ wireguard_port }}/udp
+        state: present
+
+    - import_role:
+        name: iptables
+      vars:
+        iptables_rules_v4: ../assets/iptables-{{ inventory_hostname }}.v4.j2
+        iptables_rules_v6: ../assets/iptables-{{ inventory_hostname }}.v6.j2
