@@ -1,0 +1,6 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+    - import_role:
+        name: wireguard_server

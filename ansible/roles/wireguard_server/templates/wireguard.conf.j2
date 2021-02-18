@@ -1,0 +1,13 @@
+[Interface]
+PrivateKey = {{ wireguard_private_key }}
+ListenPort = {{ wireguard_port }}
+Address = {{ wireguard_address }}/{{ wireguard_network | ipaddr('prefix') }}
+
+{% for name, host in hostvars.items() if name != inventory_hostname %}
+[Peer] # {{ name }}
+PublicKey = {{ host.wireguard_public_key }}
+{% if 'external_address' in host %}
+EndPoint = {{ host.external_address }}:{{ host.wireguard_port }}
+{% endif %}
+AllowedIPs = {{ host.wireguard_address }}/32
+{% endfor %}

@@ -1,0 +1,11 @@
+[Interface]
+PrivateKey = {{ wireguard_private_key | default('') }}
+Address = {{ wireguard_address }}/{{ wireguard_network | ipaddr('prefix') }}
+
+{% for name, host in hostvars.items() if 'external_address' in host %}
+[Peer] # {{ name }}
+PublicKey = {{ host.wireguard_public_key }}
+EndPoint = {{ host.external_address }}:{{ host.wireguard_port }}
+AllowedIPs = {{ host.wireguard_address }}/32
+PersistentKeepAlive = 25
+{% endfor %}

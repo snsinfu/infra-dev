@@ -1,0 +1,40 @@
+- name: backports repository is enabled
+  apt_repository:
+    repo: deb http://deb.debian.org/debian buster-backports main
+    state: present
+
+# Install dkms from the main repository. Otherwise, wireguard-dkms pulls in
+# backported one that depends on newer, backported kernel. We do not want to
+# install the backported kernel as it may cause compatibility issues.
+- name: stable dkms is installed
+  apt:
+    name:
+      - dkms
+      - linux-headers-{{ ansible_kernel }}
+    state: present
+
+- name: wireguard is installed
+  apt:
+    name:
+      - wireguard
+      - wireguard-dkms
+    state: present
+    default_release: buster-backports
+
+- name: wireguard is loaded
+  modprobe:
+    name: wireguard
+    state: present
+
+- name: wg-quick configuration is up
+  template:
+    src: wireguard.conf.j2
+    dest: /etc/wireguard/{{ wireguard_interface }}.conf
+    mode: "600"
+  notify: restart wg-quick
+
+- name: wg-quick is activated
+  service:
+    name: wg-quick@{{ wireguard_interface }}
+    state: started
+    enabled: true
