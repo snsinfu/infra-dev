@@ -2,16 +2,10 @@
 
 ### 1. S3 bucket
 
-This project uses AWS S3 to store Terraform states and Ansible variables.
+This project uses AWS S3 to store Terraform states and Ansible inventory.
 
-Open the S3 dashboard and create a new bucket. Create `.env` file and set the
-name of the bucket to the following variable:
-
-```
-ANSIBLE_VARS_OVERRIDES_S3_BUCKET=
-```
-
-Then, go to the IAM dashboard and create a policy for accessing the bucket:
+Open the S3 dashboard and create a new bucket. Then, go to the IAM dashboard
+and create a policy for accessing the bucket:
 
 ```
 {
@@ -39,6 +33,13 @@ AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=
 ```
 
+We'll use the bucket as a storage of Ansible inventory. An Ansible plugin will
+need to access to the bucket, so add the following variable to `.env`:
+
+```
+ANSIBLE_INVENTORY_S3_BUCKET=
+```
+
 
 ### 2. Hetzner Cloud
 
@@ -49,7 +50,7 @@ Generate an API token and add it to `.env`:
 HCLOUD_TOKEN=
 ```
 
-Encrypt the env file:
+Now, encrypt the env file:
 
 ```console
 $ gpg --symmetric .env
@@ -85,3 +86,8 @@ Then, type `make` to spin up the server. Check ssh connectivity.
 $ make
 $ make ssh
 ```
+
+
+### 4. Ansible
+
+Enter the `ansible` directory. You need to define your inventory and variables.
