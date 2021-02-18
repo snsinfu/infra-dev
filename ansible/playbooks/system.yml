@@ -1,0 +1,14 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+    - import_role:
+        name: debian
+
+    - name: basic admin tools are installed
+      apt:
+        name:
+          - htop
+          - net-tools
+          - tmux
+        state: present
