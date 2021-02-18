@@ -1,4 +1,5 @@
 ARTIFACTS = \
+  .terraform \
   _init.ok \
   _server.ok
 
@@ -7,7 +8,7 @@ ARTIFACTS = \
 all: _server.ok
 	@:
 
-clean: destroy
+clean:
 	rm -f $(ARTIFACTS)
 
 destroy:
