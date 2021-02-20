@@ -12,3 +12,10 @@
           - net-tools
           - tmux
         state: present
+
+    - name: zfs application-data dataset is present
+      zfs:
+        name: main/data
+        extra_zfs_properties:
+          mountpoint: /data
+        state: present
