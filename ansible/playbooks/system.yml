@@ -8,6 +8,7 @@
     - name: basic admin tools are installed
       apt:
         name:
+          - dnsutils
           - htop
           - net-tools
           - tmux
