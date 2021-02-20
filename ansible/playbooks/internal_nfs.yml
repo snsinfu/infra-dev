@@ -1,0 +1,19 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+    - name: nfs shared directory exists
+      zfs:
+        name: main/data/volumes
+        state: present
+
+    - name: nfs shared directory is world-writable
+      file:
+        path: /data/volumes
+        mode: "1777"
+
+    - import_role:
+        name: nfs_server
+      vars:
+        nfs_server_exports: ../assets/nfs_exports.j2
+        nfs_server_export_path: /data/volumes

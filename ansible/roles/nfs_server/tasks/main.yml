@@ -1,0 +1,23 @@
+- name: nfs server is installed
+  apt:
+    name: nfs-kernel-server
+    state: present
+
+- name: nfsv4 idmapping is disabled
+  copy:
+    content: |
+      options nfsd nfs4_disable_idmapping=1
+    dest: /etc/modprobe.d/nfsd.conf
+  notify: restart nfs server
+
+- name: nfs exports are configured
+  template:
+    src: "{{ nfs_server_exports }}"
+    dest: /etc/exports
+  notify: restart nfs server
+
+- name: nfs server is activated
+  service:
+    name: nfs-server
+    state: started
+    enabled: true
