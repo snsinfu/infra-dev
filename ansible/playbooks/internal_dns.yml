@@ -1,0 +1,8 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+    - import_role:
+        name: dnsmasq_server
+      vars:
+        dnsmasq_server_config: ../assets/dnsmasq.conf.j2

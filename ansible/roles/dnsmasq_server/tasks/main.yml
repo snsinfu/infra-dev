@@ -1,0 +1,16 @@
+- name: dnsmasq is installed
+  apt:
+    name: dnsmasq
+    state: present
+
+- name: dnsmasq configuration is up
+  template:
+    src: "{{ dnsmasq_server_config }}"
+    dest: /etc/dnsmasq.d/dnsmasq.conf
+  notify: restart dnsmasq
+
+- name: dnsmasq is activated
+  service:
+    name: dnsmasq
+    state: started
+    enabled: true
