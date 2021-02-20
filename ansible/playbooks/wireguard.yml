@@ -4,3 +4,11 @@
   tasks:
     - import_role:
         name: wireguard_server
+
+    - name: wireguard hostnames are registered
+      stanza:
+        path: /etc/hosts
+        content: |
+          {% for host in hostvars.values() %}
+          {{ host.wireguard_address }} {{ host.wireguard_hostname }} {{ host.wireguard_extra_hostnames | join(' ') }}
+          {% endfor %}
