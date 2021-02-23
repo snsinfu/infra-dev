@@ -1,0 +1,21 @@
+# This file defines variables for Kubernetes/Postgres developer operations.
+
+vars:
+  common:
+    # We deploy Traefik v2 as an HTTP router with automatic TLS certificate
+    # management. Specify your email address for Let's Encrypt.
+    k3s_letsencrypt_email: your-email@example.com
+
+    # Password for PostgreSQL superuser `postgres`. This will be stored in the
+    # .pgpass file of the admin account, so you will not need to enter this in
+    # database operations. Just paste `openssl rand -hex 16` or something.
+    postgres_superuser_password: ...
+
+    cluster_developers:
+      # Developer accounts. They cannot sudo but they have access to PostgreSQL
+      # and K3s.
+
+      - name: john
+        authorized_keys:
+          - ssh-ed25519 AAAAC...
+        postgres_password: f35e...

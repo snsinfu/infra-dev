@@ -1,0 +1,35 @@
+# This file defines the Wireguard private network.
+
+vars:
+  common:
+    # Configure Wireguard UDP port and network CIDR here.
+    wireguard_port: 888
+    wireguard_network: 10.1.1.0/24
+    wireguard_interface: wg0
+    wireguard_address: "{{ wireguard_network | nthhost(wireguard_host_id) }}"
+    wireguard_public_key: "{{ wireguard_private_key | wg_pubkey }}"
+    wireguard_hostname: "{{ inventory_hostname }}.hosts.internal"
+    wireguard_extra_hostnames: []
+
+  host:
+    # Define Wireguard host ID and private key for all hosts.
+
+    javelin:
+      wireguard_host_id: 10
+      wireguard_private_key: ...
+      wireguard_extra_hostnames:
+        - nfs.internal
+        - postgres.internal
+        - k3s.internal
+
+    dev1:
+      wireguard_host_id: 201
+      wireguard_private_key: ...
+
+    dev2:
+      wireguard_host_id: 202
+      wireguard_private_key: ...
+
+    dev3:
+      wireguard_host_id: 203
+      wireguard_private_key: ...
