@@ -33,12 +33,6 @@
         dest: /usr/local/bin/dev-mkdatabase
         mode: "755"
 
-    - name: dev-mkvolume script is up
-      copy:
-        src: ../assets/dev-mkvolume.sh
-        dest: /usr/local/bin/dev-mkvolume
-        mode: "755"
-
 
     # DEVELOPER USERS --------------------------------------------------------
 
@@ -55,14 +49,6 @@
         shell: /bin/bash
         state: present
       with_items: "{{ cluster_developers }}"
-
-    - name: developer users are restricted sudoers
-      copy:
-        content: |
-          %dev ALL=(root) NOPASSWD: \
-            /usr/local/bin/dev-mkvolume
-        dest: /etc/sudoers.d/dev
-        mode: "600"
 
 
     # SSH --------------------------------------------------------------------
