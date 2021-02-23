@@ -1,0 +1,28 @@
+- name: mackerel repository key is registered
+  apt_key:
+    id: 9dd9479d06baa71322803ac166332b78417e73ea
+    url: https://mackerel.io/file/cert/GPG-KEY-mackerel-v2
+    state: present
+
+- name: mackerel repository is registered
+  apt_repository:
+    repo: deb http://apt.mackerel.io/v2/ mackerel contrib
+    state: present
+
+- name: mackerel-agent is installed
+  apt:
+    name: mackerel-agent
+    state: present
+
+- name: mackerel-agent configuration is up
+  template:
+    src: "{{ mackerel_config }}"
+    dest: /etc/mackerel-agent/mackerel-agent.conf
+    mode: "600"
+  notify: restart mackerel-agent
+
+- name: mackerel-agent is activated
+  service:
+    name: mackerel-agent
+    state: started
+    enabled: yes

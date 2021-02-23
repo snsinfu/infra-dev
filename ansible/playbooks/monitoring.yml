@@ -1,0 +1,9 @@
+- hosts: servers
+  become: true
+
+  tasks:
+    - name: mackerel is installed
+      import_role:
+        name: mackerel
+      vars:
+        mackerel_config: ../assets/mackerel-agent-{{ inventory_hostname }}.conf.j2
