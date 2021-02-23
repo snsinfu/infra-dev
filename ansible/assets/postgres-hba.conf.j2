@@ -1,0 +1,13 @@
+# TYPE  DATABASE    USER        ADDRESS         METHOD
+
+# Superuser
+local   all         postgres                    scram-sha-256
+
+# Developers
+{% for dev in cluster_developers %}
+local   all         {{ dev.name }}              scram-sha-256
+{% endfor %}
+
+# Database owners
+local   sameuser    all                         scram-sha-256
+host    sameuser    all         0.0.0.0/0       scram-sha-256

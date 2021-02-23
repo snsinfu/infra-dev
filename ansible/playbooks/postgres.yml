@@ -1,0 +1,17 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+    - name: postgres zfs dataset is present
+      zfs:
+        name: main/data/postgres-13
+        state: present
+
+    - import_role:
+        name: postgres_server
+      vars:
+        postgres_config: ../assets/postgres-server.conf.j2
+        postgres_hba: ../assets/postgres-hba.conf.j2
+        postgres_cluster: main
+        postgres_version: 13
+        postgres_datadir: /data/postgres-13

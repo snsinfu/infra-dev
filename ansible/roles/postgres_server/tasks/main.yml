@@ -1,0 +1,84 @@
+- name: ansible prerequisites are installed
+  apt:
+    name:
+      - gnupg
+      - python3-pexpect
+      - python3-psycopg2
+    state: present
+
+- name: postgres apt signing key is added
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: postgres repository is added
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_lsb.codename }}-pgdg main
+    state: present
+    filename: pgdg.list
+
+- name: postgres cluster manager is installed
+  apt:
+    name: postgresql-common
+    state: present
+
+- name: postgres createcluster config directory is present
+  file:
+    path: /etc/postgresql-common/createcluster.d
+    state: directory
+
+- name: postgres default cluster creation is suppressed
+  copy:
+    content: |
+      create_main_cluster = false
+    dest: /etc/postgresql-common/createcluster.d/50-no_main_cluster.conf
+
+- name: postgres server is installed
+  apt:
+    name: postgresql-{{ postgres_version }}
+    state: present
+
+- name: postgres cluster is created
+  expect:
+    command: >
+      pg_createcluster
+        --locale C.UTF-8
+        --port 5432
+        --datadir {{ postgres_datadir }}
+        {{ postgres_version }}
+        {{ postgres_cluster }}
+        --
+        --auth scram-sha-256
+        --pwprompt
+    creates: "{{ postgres_datadir }}/PG_VERSION"
+    responses:
+      "(password|again):": "{{ postgres_superuser_password }}"
+
+- name: postgres server config is up
+  template:
+    src: "{{ postgres_config }}"
+    dest: /etc/postgresql/{{ postgres_version }}/{{ postgres_cluster }}/conf.d/server.conf
+    owner: postgres
+    group: postgres
+    mode: "644"
+  notify: restart postgres server
+
+- name: postgres access config is up
+  template:
+    src: "{{ postgres_hba }}"
+    dest: /etc/postgresql/{{ postgres_version }}/{{ postgres_cluster }}/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: "640"
+  notify: restart postgres server
+
+- name: postgres service is activated
+  service:
+    name: postgresql@{{ postgres_version }}-{{ postgres_cluster }}
+    state: started
+    enabled: true
+
+- name: postgres cluster is accessible
+  postgresql_ping:
+    db: postgres
+    login_password: "{{ postgres_superuser_password }}"
