@@ -1,0 +1,113 @@
+- hosts: javelin
+  become: true
+
+  tasks:
+
+    # DEVELOPER TOOLS --------------------------------------------------------
+
+    - name: git is installed
+      apt:
+        name: git
+        state: present
+
+    - name: git repository template directory is present
+      file:
+        path: /usr/local/share/git-templates/autodeploy/hooks
+        state: directory
+
+    - name: git repository template is up
+      copy:
+        src: ../assets/autodeploy-hook.sh
+        dest: /usr/local/share/git-templates/autodeploy/hooks/pre-receive
+        mode: "755"
+
+    - name: dev-mkrepo script is up
+      copy:
+        src: ../assets/dev-mkrepo.sh
+        dest: /usr/local/bin/dev-mkrepo
+        mode: "755"
+
+    - name: dev-mkdatabase script is up
+      copy:
+        src: ../assets/dev-mkdatabase.sh
+        dest: /usr/local/bin/dev-mkdatabase
+        mode: "755"
+
+    - name: dev-mkvolume script is up
+      copy:
+        src: ../assets/dev-mkvolume.sh
+        dest: /usr/local/bin/dev-mkvolume
+        mode: "755"
+
+
+    # DEVELOPER USERS --------------------------------------------------------
+
+    - name: developer group is present
+      group:
+        name: dev
+        state: present
+
+    - name: developer users are present
+      user:
+        name: "{{ item.name }}"
+        groups: dev
+        password: "*"
+        shell: /bin/bash
+        state: present
+      with_items: "{{ cluster_developers }}"
+
+    - name: developer users are restricted sudoers
+      copy:
+        content: |
+          %dev ALL=(root) NOPASSWD: \
+            /usr/local/bin/dev-mkvolume
+        dest: /etc/sudoers.d/dev
+        mode: "600"
+
+
+    # SSH --------------------------------------------------------------------
+
+    - name: developer ssh directory is present
+      file:
+        path: /home/{{ item.name }}/.ssh
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: "700"
+      with_items: "{{ cluster_developers }}"
+
+    - name: developer ssh keys are injected
+      stanza:
+        path: /home/{{ item.name }}/.ssh/authorized_keys
+        content: |
+          {% for key in item.authorized_keys %}
+          {{ key }}
+          {% endfor %}
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: "600"
+        create: true
+      with_items: "{{ cluster_developers }}"
+
+
+    # POSTGRES ---------------------------------------------------------------
+
+    - name: postgres developer users are present
+      postgresql_user:
+        name: "{{ item.name }}"
+        password: "{{ item.postgres_password }}"
+        role_attr_flags: CREATEDB,CREATEROLE
+        state: present
+        login_password: "{{ postgres_superuser_password }}"
+      with_items: "{{ cluster_developers }}"
+
+    - name: pgpass stores postgres developer password
+      lineinfile:
+        path: /home/{{ item.name }}/.pgpass
+        line: "localhost:5432:*:{{ item.name }}:{{ item.postgres_password }}"
+        regexp: "^localhost:5432:*:{{ item.name }}:"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: "600"
+        create: true
+      with_items: "{{ cluster_developers }}"
