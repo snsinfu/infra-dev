@@ -23,4 +23,7 @@
 -A INPUT -j ACCEPT -i {{ wireguard_interface }} -p tcp --dport k3s        -m state --state NEW
 -A INPUT -j REJECT -i {{ wireguard_interface }}
 
+# Container networking
+-A INPUT -j ACCEPT -i cni0 -m state --state NEW
+
 COMMIT

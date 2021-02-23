@@ -1,0 +1,6 @@
+write-kubeconfig-mode: "644"
+resolv-conf: /etc/rancher/k3s/resolv.conf
+node-ip: "{{ wireguard_address }}"
+node-external-ip: "{{ ansible_default_ipv4.address }}"
+tls-san: k3s.internal
+disable: traefik

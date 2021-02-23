@@ -3,5 +3,6 @@ plugin: s3
 overrides:
   - key: vars/hosts.yml
   - key: vars/system.yml
+  - key: vars/cluster_devs.yml
   - key: vars/wireguard.yml
   - key: vars/host_access.yml

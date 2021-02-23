@@ -1,0 +1,52 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+
+metadata:
+  name: traefik
+  namespace: kube-system
+
+spec:
+  valuesContent: |
+    additionalArguments:
+      # LE staging resolver
+      - --certificatesresolvers.letsencrypt-staging.acme.email={{ k3s_letsencrypt_email }}
+      - --certificatesresolvers.letsencrypt-staging.acme.storage=/data/acme-staging.json
+      - --certificatesresolvers.letsencrypt-staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.letsencrypt-staging.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt-staging.acme.httpchallenge.entryPoint=web
+      # LE production resolver
+      - --certificatesresolvers.letsencrypt.acme.email={{ k3s_letsencrypt_email }}
+      - --certificatesresolvers.letsencrypt.acme.storage=/data/acme.json
+      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entryPoint=web
+    persistence:
+      enabled: true
+      path: /data
+
+    # Below is K3s' default chart configuration.
+    rbac:
+      enabled: true
+    ports:
+      websecure:
+        tls:
+          enabled: true
+    podAnnotations:
+      prometheus.io/port: "8082"
+      prometheus.io/scrape: "true"
+    providers:
+      kubernetesIngress:
+        publishedService:
+          enabled: true
+    priorityClassName: "system-cluster-critical"
+    image:
+      name: "rancher/library-traefik"
+    tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"

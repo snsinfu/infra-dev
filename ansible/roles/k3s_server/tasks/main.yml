@@ -1,0 +1,23 @@
+- name: k3s install script is present
+  get_url:
+    url: https://github.com/k3s-io/k3s/raw/{{ k3s_version }}/install.sh
+    checksum: "{{ k3s_installer_sum }}"
+    dest: /root/k3s-install.sh
+    mode: "744"
+
+- name: k3s config directory is present
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+
+- name: k3s server config is up
+  template:
+    src: "{{ k3s_server_config }}"
+    dest: /etc/rancher/k3s/config.yaml
+
+- name: k3s is installed
+  command: /root/k3s-install.sh
+  args:
+    creates: /usr/local/bin/k3s
+  environment:
+    INSTALL_K3S_VERSION: "{{ k3s_version }}"
