@@ -5,10 +5,10 @@
   tasks:
     - name: output directory exists
       file:
-        path: _output
+        path: ../_output
         state: directory
 
     - import_role:
         name: wireguard_client
       vars:
-        wireguard_client_output: _output/wg-{{ inventory_hostname }}.conf
+        wireguard_client_output: ../_output/wg-{{ inventory_hostname }}.conf
