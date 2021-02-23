@@ -23,30 +23,3 @@ spec:
     persistence:
       enabled: true
       path: /data
-
-    # Below is K3s' default chart configuration.
-    rbac:
-      enabled: true
-    ports:
-      websecure:
-        tls:
-          enabled: true
-    podAnnotations:
-      prometheus.io/port: "8082"
-      prometheus.io/scrape: "true"
-    providers:
-      kubernetesIngress:
-        publishedService:
-          enabled: true
-    priorityClassName: "system-cluster-critical"
-    image:
-      name: "rancher/library-traefik"
-    tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-    - key: "node-role.kubernetes.io/control-plane"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "node-role.kubernetes.io/master"
-      operator: "Exists"
-      effect: "NoSchedule"
