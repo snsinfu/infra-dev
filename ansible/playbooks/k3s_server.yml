@@ -1,0 +1,105 @@
+- hosts: javelin
+  become: true
+
+  vars:
+    containerd_quota: 30G
+
+  tasks:
+
+    # K3s' containerd does not work on ZFS [1]. So, we create an ext4
+    # filesystem on a ZFS volume. We also create a separate dataset for
+    # overlays to limit storage usage by containers.
+    # [1]: https://github.com/k3s-io/k3s/issues/66
+
+    - name: containerd dataset is present
+      zfs:
+        name: main/containerd
+        extra_zfs_properties:
+          mountpoint: "none"
+          quota: "{{ containerd_quota }}"
+        state: present
+
+    - name: containerd root volume is present
+      zfs:
+        name: main/containerd/root
+        extra_zfs_properties:
+          volsize: "{{ containerd_quota }}"
+          refreservation: "none"
+        state: present
+
+    - name: containerd state dataset is present
+      zfs:
+        name: main/containerd/state
+        extra_zfs_properties:
+          mountpoint: /run/k3s/containerd
+        state: present
+
+    - name: containerd root is ext4
+      filesystem:
+        dev: /dev/zvol/main/containerd/root
+        fstype: ext4
+        state: present
+
+    - name: containerd root mountpoint is present
+      file:
+        path: /var/lib/rancher/k3s/agent/containerd
+        state: directory
+
+    - name: containerd root is mounted
+      mount:
+        path: /var/lib/rancher/k3s/agent/containerd
+        src: /dev/zvol/main/containerd/root
+        fstype: ext4
+        state: mounted
+
+    # K3s
+
+    - name: k3s config directory is present
+      file:
+        path: /etc/rancher/k3s
+        state: directory
+
+    - name: k3s internal domain config is up
+      copy:
+        content: |
+          nameserver {{ wireguard_address }}
+        dest: /etc/rancher/k3s/resolv.conf
+
+    - name: k3s manifests directory is present
+      file:
+        path: /var/lib/rancher/k3s/server/manifests
+        state: directory
+
+    - name: traefik v2 chart is up
+      copy:
+        src: ../assets/traefik-v2.yaml
+        dest: /var/lib/rancher/k3s/server/manifests/traefik-v2.yaml
+
+    - name: traefik v2 chart config is up
+      template:
+        src: ../assets/traefik-v2-config.yaml.j2
+        dest: /var/lib/rancher/k3s/server/manifests/traefik-v2-config.yaml
+
+    - import_role:
+        name: k3s_server
+      vars:
+        k3s_server_config: ../assets/k3s-config.yaml.j2
+
+    # Kim
+
+    - name: kim is installed
+      get_url:
+        url: "https://github.com/rancher/kim/releases/download/v0.1.0-alpha.3/kim-linux-amd64"
+        checksum: "sha256:ca65151cdd367285bb08c6de987312cc96d9ac58c145e0f1bbc1b97361c39d62"
+        dest: /usr/local/bin/kim
+        mode: "755"
+
+    - name: buildkit directory is present
+      file:
+        path: /var/lib/buildkit
+        state: directory
+
+    - name: kim is installed
+      command: kim builder install
+      args:
+        creates: /var/lib/buildkit/containerd-overlayfs/workerid
