@@ -1,3 +1,14 @@
+# infra-dev
+
+Infrastructure code for personal K3s server on Hetzner Cloud. Components:
+
+- K3s
+- Kim (`kubectl image` and `kubectl builder`)
+- NFS (for persistent volume)
+- PostgreSQL
+- Wireguard (for internal networking)
+
+
 ## Instruction
 
 ### 1. S3 bucket
@@ -91,3 +102,40 @@ $ make ssh
 ### 4. Ansible
 
 Enter the `ansible` directory. You need to define your inventory and variables.
+Create these files in the S3 bucket created earlier (TODO: document):
+
+```
+vars/
+  hosts.yml
+  system.yml
+  cluster_devs.yml
+  wireguard.yml
+  host_access.yml
+```
+
+You may want to create the files locally in `_vars` directory, and transfer
+them using [s3cmd][s3cmd]:
+
+```console
+$ ls _vars
+cluster_devs.yml hosts.yml        wireguard.yml
+host_access.yml  system.yml
+$ s3cmd put _vars/* s3://$ANSIBLE_INVENTORY_S3_BUCKET/vars/
+```
+
+Once you defined the innventory, type `make` to run Ansible playbooks:
+
+```console
+$ make
+```
+
+Wireguard client configurations should be generated in `_output` directory.
+Configure wireguard interface on your local machine and establish a tunnel
+to the server. Then, enable firewall on the server. The firewall blocks public
+SSH connection without tunneling.
+
+```console
+$ make _firewall.ok
+```
+
+[s3cmd]: https://github.com/s3tools/s3cmd
