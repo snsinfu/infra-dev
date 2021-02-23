@@ -8,6 +8,7 @@
     - name: basic admin tools are installed
       apt:
         name:
+          - curl
           - dnsutils
           - htop
           - net-tools
