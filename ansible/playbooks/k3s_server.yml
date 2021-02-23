@@ -103,3 +103,12 @@
       command: kim builder install
       args:
         creates: /var/lib/buildkit/containerd-overlayfs/workerid
+
+    - name: kim is usable as kubectl subcommands
+      file:
+        path: /usr/local/bin/{{ item }}
+        src: /usr/local/bin/kim
+        state: link
+      with_items:
+        - kubectl-image
+        - kubectl-builder
