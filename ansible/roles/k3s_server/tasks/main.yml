@@ -16,8 +16,10 @@
     dest: /etc/rancher/k3s/config.yaml
 
 - name: k3s is installed
-  command: /root/k3s-install.sh
+  shell: |
+    /root/k3s-install.sh
+    touch /etc/rancher/k3s/.installed-{{ k3s_version }}
   args:
-    creates: /usr/local/bin/k3s
+    creates: /etc/rancher/k3s/.installed-{{ k3s_version }}
   environment:
     INSTALL_K3S_VERSION: "{{ k3s_version }}"
