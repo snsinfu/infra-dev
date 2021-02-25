@@ -21,3 +21,15 @@
         extra_zfs_properties:
           mountpoint: /data
         state: present
+
+    - name: zfs snapshot retention script is up
+      copy:
+        src: ../assets/snapshot_retention.py
+        dest: /usr/local/sbin/snapshot_retention.py
+        mode: "755"
+
+    - name: zfs daily snapshot script is up
+      copy:
+        src: ../assets/zfs_daily_snapshot.sh
+        dest: /etc/cron.daily/zfs_daily_snapshot.sh
+        mode: "755"
