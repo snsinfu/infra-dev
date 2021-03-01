@@ -20,3 +20,8 @@
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     line: Unattended-Upgrade::Automatic-Reboot "true";
     state: present
+
+- name: anacron is installed
+  apt:
+    name: anacron
+    state: present
