@@ -31,5 +31,5 @@
     - name: zfs daily snapshot script is up
       copy:
         src: ../assets/zfs_daily_snapshot.sh
-        dest: /etc/cron.daily/zfs_daily_snapshot.sh
+        dest: /etc/cron.daily/zfs_daily_snapshot
         mode: "755"
