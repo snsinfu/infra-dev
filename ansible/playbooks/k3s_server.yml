@@ -112,3 +112,11 @@
       with_items:
         - kubectl-image
         - kubectl-builder
+
+    # Kim management
+
+    - name: kim_prune_images script is up
+      copy:
+        src: ../assets/kim_prune_images.sh
+        dest: /etc/cron.hourly/kim_prune_image
+        mode: "755"
