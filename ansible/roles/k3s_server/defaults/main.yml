@@ -1,2 +1,2 @@
-k3s_version: "v1.20.4+k3s1"
-k3s_installer_sum: "sha256:c63032985492e6fb3e7642b244a22ec7ad2f5a4f023a729de77b941dd19c6a59"
+k3s_version: "v1.21.2+k3s1"
+k3s_installer_sum: "sha256:3a053a6acb6d348b8dc15c4c3d0eb78ff05e77021dbf30a537c7dd6574f2e84c"

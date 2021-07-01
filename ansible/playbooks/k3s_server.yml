@@ -65,17 +65,7 @@
           nameserver {{ wireguard_address }}
         dest: /etc/rancher/k3s/resolv.conf
 
-    - name: k3s manifests directory is present
-      file:
-        path: /var/lib/rancher/k3s/server/manifests
-        state: directory
-
-    - name: traefik v2 chart is up
-      copy:
-        src: ../assets/traefik-v2.yaml
-        dest: /var/lib/rancher/k3s/server/manifests/traefik-v2.yaml
-
-    - name: traefik v2 chart config is up
+    - name: traefik chart config is up
       template:
         src: ../assets/traefik-v2-config.yaml.j2
         dest: /var/lib/rancher/k3s/server/manifests/traefik-v2-config.yaml
@@ -89,8 +79,8 @@
 
     - name: kim is installed
       get_url:
-        url: "https://github.com/rancher/kim/releases/download/v0.1.0-alpha.3/kim-linux-amd64"
-        checksum: "sha256:ca65151cdd367285bb08c6de987312cc96d9ac58c145e0f1bbc1b97361c39d62"
+        url: "https://github.com/rancher/kim/releases/download/v0.1.0-beta.2/kim-linux-amd64"
+        checksum: "sha256:fe5c4bf438dafff77b668be4a5fcb535ebcf703b564e9596f3694bcf26a05b50"
         dest: /usr/local/bin/kim
         mode: "755"
 
@@ -99,7 +89,7 @@
         path: /var/lib/buildkit
         state: directory
 
-    - name: kim is installed
+    - name: kim is installed on the cluster
       command: kim builder install
       args:
         creates: /var/lib/buildkit/containerd-overlayfs/workerid

@@ -1,3 +1,11 @@
+# https://github.com/rancher/k3os/issues/702
+- name: apparmor is installed
+  apt:
+    name:
+      - apparmor
+      - apparmor-utils
+    state: present
+
 - name: k3s install script is present
   get_url:
     url: https://github.com/k3s-io/k3s/raw/{{ k3s_version }}/install.sh
